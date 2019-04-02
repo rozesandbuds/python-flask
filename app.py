@@ -1,6 +1,19 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for
 import requests
 import json
+import pyrebase
+
+config = {
+    "apiKey": "AIzaSyD90J2SBHbXM1w475rrET4zi_uCQQt0osE",
+    "authDomain": "python-72493.firebaseapp.com",
+    "databaseURL": "https://python-72493.firebaseio.com",
+    "projectId": "python-72493",
+    "storageBucket": "python-72493.appspot.com",
+    "messagingSenderId": "984337128335"
+};
+
+firebase = pyrebase.initialize_app(config)
+db = firebase.database()
 
 app = Flask(__name__)
 
@@ -14,13 +27,12 @@ def form():
 
 @app.route("/form", methods=['POST'])
 def sendtodb():
-    db = 'https://python-72493.firebaseio.com'
     email = request.form['email']
     phone = request.form['phone']
     survey = request.form['survey']
-    data = {email: email, phone: phone, survey: survey}
-    r = requests.post('https://python-72493.firebaseio.com/surveys', data=data)
-    return render_template('index.html')
+    data = {"email": email, "phone": phone, "survey": survey}
+    db.child("surveys").push(json.dumps(data))
+    return redirect(url_for('hello'))
 
 @app.route("/surveys")
 def surveys():
