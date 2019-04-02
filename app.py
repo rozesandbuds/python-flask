@@ -10,7 +10,7 @@ config = {
     "projectId": "python-72493",
     "storageBucket": "python-72493.appspot.com",
     "messagingSenderId": "984337128335"
-};
+}
 
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()
@@ -35,8 +35,13 @@ def sendtodb():
     return redirect(url_for('hello'))
 
 @app.route("/surveys")
-def surveys():
-    return render_template('survey.html')
+def surveysView():
+    data = db.child("surveys").get()
+    surveys = []
+    for s in data.each():
+        survey = json.loads(s.val())
+        surveys.append(survey)
+    return render_template('survey.html', surveys=surveys)
 
 @app.route("/about")
 def about():
